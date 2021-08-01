@@ -12,10 +12,13 @@ feature 'Feature for' do
     visit HOME_PAGE_MVIDEO
     PREFERENCES_SITE.set_city(ENV['CITY'] || 'Краснодар')
 
-    items = Nokogiri::HTML.parse(source).xpath(PATHS[:products_block]).map do |product|
-      LinkHelpers.get_item_link(product)
-    end.reject { |item| item[:price] > DELICIOUS_PRICE }
+    loop do
+      wait_minutes(1)
+      items = Nokogiri::HTML.parse(source).xpath(PATHS[:products_block]).map do |product|
+        LinkHelpers.get_item_link(product)
+      end.reject { |item| item[:price] > DELICIOUS_PRICE }
 
-    TelegramHelpers.send_in_message(items)
+      TelegramHelpers.send_in_message(items)
+    end
   end
 end
