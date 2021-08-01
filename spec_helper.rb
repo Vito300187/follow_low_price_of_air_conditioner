@@ -11,15 +11,15 @@ require 'yaml'
 require_relative 'helpers/path_helpers'
 require_relative 'helpers/preferences_site_helpers'
 
+if !File.file?('telegram_bot.yml') || File.empty?('telegram_bot.yml')
+  raise 'Sorry, but you need to create file named `telegram_bot.yml` and set `CHAT_BOT_TOKEN: ...`'
+end
+
 def chrome_version
   `chromedriver -v`.split(' ')
     .reject { |a| a == 'ChromeDriver' }
     .first
     .split('.')[0] << '.0'
-end
-
-def telegram_bot_file_is_missing?
-  !File.file?('telegram_bot.yml') || File.empty?('telegram_bot.yml')
 end
 
 def wait_minutes(count)
@@ -54,6 +54,4 @@ PATHS = PathsHelpers.paths
 HOME_PAGE_MVIDEO = PATHS[:home_page]
 PREFERENCES_SITE = PreferencesSiteHelper.new
 
-if telegram_bot_file_is_missing?
-  raise 'Sorry, but you need to create file named `telegram_bot.yml` and set `CHAT_BOT_TOKEN: ...`'
-end
+
