@@ -18,6 +18,10 @@ def chrome_version
     .split('.')[0] << '.0'
 end
 
+def telegram_bot_file_is_missing?
+  !File.file?('telegram_bot.yml') || File.empty?('telegram_bot.yml')
+end
+
 def wait_minutes(count)
   puts Time.now.strftime('%d/%m/%y - %H:%M')
   page.refresh
@@ -49,3 +53,7 @@ DELICIOUS_PRICE = 16_000
 PATHS = PathsHelpers.paths
 HOME_PAGE_MVIDEO = PATHS[:home_page]
 PREFERENCES_SITE = PreferencesSiteHelper.new
+
+if telegram_bot_file_is_missing?
+  raise 'Sorry, but you need to create file named `telegram_bot.yml` and set `CHAT_BOT_TOKEN: ...`'
+end
