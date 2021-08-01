@@ -13,7 +13,7 @@ feature 'Feature for' do
     PREFERENCES_SITE.set_city(ENV['CITY'] || 'Краснодар')
 
     loop do
-      wait_minutes(1)
+      wait_minutes(5)
       items = Nokogiri::HTML.parse(source).xpath(PATHS[:products_block]).map do |product|
         LinkHelpers.get_item_link(product)
       end.reject { |item| item[:price] > DELICIOUS_PRICE }

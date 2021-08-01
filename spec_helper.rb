@@ -38,6 +38,7 @@ Capybara.register_driver(:remote_chrome) do |app|
   caps[:browser_name] = 'chrome'
   caps[:version] = chrome_version
   caps['enableVNC'] = true
+  caps['sessionTimeout'] = '720h'
   caps['goog:chromeOptions'] = { 'args' => %w[--no-sandbox] }
   opts = {
     browser: :remote,
@@ -49,9 +50,7 @@ end
 RSpec.configure { Capybara.page.driver.browser.manage.window.maximize }
 Telegram.bots_config = { default: YAML.safe_load(File.read('telegram_bot.yml'))['CHAT_BOT_TOKEN'] }
 
-DELICIOUS_PRICE = 16_000
+DELICIOUS_PRICE = ENV['PRICE'].nil? ? 20_000 : ENV['PRICE']
 PATHS = PathsHelpers.paths
 HOME_PAGE_MVIDEO = PATHS[:home_page]
 PREFERENCES_SITE = PreferencesSiteHelper.new
-
-
