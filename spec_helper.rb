@@ -29,18 +29,25 @@ def wait_minutes(count)
   sleep 60 * count
 end
 
+Capybara.configure do |config|
+  config.default_max_wait_time = 10
+  config.default_driver = :remote_chrome
+  config.javascript_driver = :remote_chrome
+end
+
 if ENV['SELEN']
   Capybara.register_driver(:remote_chrome) do |app|
     caps = Selenium::WebDriver::Remote::Capabilities.chrome
     caps[:browser_name] = 'chrome'
     caps[:version] = chrome_version
     caps['enableVNC'] = true
-    caps['sessionTimeout'] = '720h'
+    caps['sessionTimeout'] = '10m'
     caps['goog:chromeOptions'] = { 'args' => %w[--no-sandbox] }
     opts = {
       browser: :remote,
       url: 'http://localhost:4444/wd/hub',
-      desired_capabilities: caps
+      desired_capabilities: caps,
+      timeout: 300
     }
     Capybara::Selenium::Driver.new(app, **opts)
   end
@@ -52,15 +59,10 @@ elsif ENV['HEADLESS']
     Capybara::Selenium::Driver.new(
       app,
       browser: :chrome,
-      desired_capabilities: capabilities
+      desired_capabilities: capabilities,
+      timeout: 300
     )
   end
-end
-
-Capybara.configure do |config|
-  config.default_max_wait_time = 10
-  config.default_driver = :chrome
-  config.javascript_driver = :chrome
 end
 
 RSpec.configure do
