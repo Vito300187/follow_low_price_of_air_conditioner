@@ -5,7 +5,7 @@ require_relative 'helpers/telegram_helpers'
 require_relative 'helpers/link_helpers'
 
 feature 'Feature for' do
-  scenario 'Test for' do
+  scenario 'Crawler' do
     include TelegramHelpers
     include LinkHelpers
 
@@ -13,7 +13,7 @@ feature 'Feature for' do
     PREFERENCES_SITE.set_city(ENV['CITY'] || 'Краснодар')
 
     loop do
-      wait_minutes(5)
+      wait_minutes(3)
       items = Nokogiri::HTML.parse(source).xpath(PATHS[:products_block]).map do |product|
         LinkHelpers.get_item_link(product)
       end.reject { |item| item[:price] > DELICIOUS_PRICE }

@@ -1,5 +1,6 @@
 # frozen_string_literal: true
 
+require 'capybara-screenshot/rspec'
 require 'capybara'
 require 'capybara/dsl'
 require 'capybara/rspec'
@@ -28,26 +29,45 @@ def wait_minutes(count)
   sleep 60 * count
 end
 
+if ENV['SELEN']
+  Capybara.register_driver(:remote_chrome) do |app|
+    caps = Selenium::WebDriver::Remote::Capabilities.chrome
+    caps[:browser_name] = 'chrome'
+    caps[:version] = chrome_version
+    caps['enableVNC'] = true
+    caps['sessionTimeout'] = '720h'
+    caps['goog:chromeOptions'] = { 'args' => %w[--no-sandbox] }
+    opts = {
+      browser: :remote,
+      url: 'http://localhost:4444/wd/hub',
+      desired_capabilities: caps
+    }
+    Capybara::Selenium::Driver.new(app, **opts)
+  end
+elsif ENV['HEADLESS']
+  Capybara.register_driver :chrome do |app|
+    capabilities = Selenium::WebDriver::Remote::Capabilities.chrome(
+      'goog:chromeOptions': { args: %w[headless disable-gpu --no-sandbox] }
+    )
+    Capybara::Selenium::Driver.new(
+      app,
+      browser: :chrome,
+      desired_capabilities: capabilities
+    )
+  end
+end
+
 Capybara.configure do |config|
   config.default_max_wait_time = 10
-  config.default_driver = :remote_chrome
-  config.javascript_driver = :remote_chrome
+  config.default_driver = :chrome
+  config.javascript_driver = :chrome
 end
-Capybara.register_driver(:remote_chrome) do |app|
-  caps = Selenium::WebDriver::Remote::Capabilities.chrome
-  caps[:browser_name] = 'chrome'
-  caps[:version] = chrome_version
-  caps['enableVNC'] = true
-  caps['sessionTimeout'] = '720h'
-  caps['goog:chromeOptions'] = { 'args' => %w[--no-sandbox] }
-  opts = {
-    browser: :remote,
-    url: 'http://localhost:4444/wd/hub',
-    desired_capabilities: caps
-  }
-  Capybara::Selenium::Driver.new(app, **opts)
+
+RSpec.configure do
+  window = Capybara.page.driver.browser.manage.window
+  ENV['HEADLESS'].nil? ? window.maximize : window.resize_to(1920, 1080)
 end
-RSpec.configure { Capybara.page.driver.browser.manage.window.maximize }
+
 Telegram.bots_config = { default: YAML.safe_load(File.read('telegram_bot.yml'))['CHAT_BOT_TOKEN'] }
 
 DELICIOUS_PRICE = ENV['PRICE'].nil? ? 20_000 : ENV['PRICE']

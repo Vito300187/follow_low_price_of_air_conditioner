@@ -31,6 +31,9 @@ GEM
       rack-test (>= 0.6.3)
       regexp_parser (~> 1.5)
       xpath (~> 3.2)
+    capybara-screenshot (1.0.25)
+      capybara (>= 1.0, < 4)
+      launchy
     childprocess (3.0.0)
     coderay (1.1.3)
     concurrent-ruby (1.1.9)
@@ -40,6 +43,8 @@ GEM
     httpclient (2.8.3)
     i18n (1.8.10)
       concurrent-ruby (~> 1.0)
+    launchy (2.5.0)
+      addressable (~> 2.7)
     loofah (2.10.0)
       crass (~> 1.0.2)
       nokogiri (>= 1.5.9)
@@ -94,6 +99,7 @@ PLATFORMS
 
 DEPENDENCIES
   capybara
+  capybara-screenshot
   nokogiri
   pry
   rspec

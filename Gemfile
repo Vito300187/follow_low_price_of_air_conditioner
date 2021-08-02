@@ -3,6 +3,7 @@
 source 'https://rubygems.org'
 
 gem 'capybara'
+gem 'capybara-screenshot'
 gem 'nokogiri'
 gem 'pry'
 gem 'rspec'
