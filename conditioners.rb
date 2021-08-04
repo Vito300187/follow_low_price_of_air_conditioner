@@ -13,10 +13,14 @@ feature 'Feature for' do
     PREFERENCES_SITE.set_city(ENV['CITY'] || 'Краснодар')
 
     loop do
-      wait_minutes(3)
-      items = Nokogiri::HTML.parse(source).xpath(PATHS[:products_block]).map do |product|
-        LinkHelpers.get_item_link(product)
-      end.reject { |item| item[:price] > DELICIOUS_PRICE }
+      PREFERENCES_SITE.scroll(:down)
+      wait_minutes(5)
+
+      items_raw = Nokogiri::HTML.parse(source).xpath(PATHS[:products_block])
+      puts 'Получение ссылок на url, image, description, price'
+
+      items = items_raw.map { |product| LinkHelpers.get_item_link(product) }.
+        reject { |item| item[:price] > DELICIOUS_PRICE }
 
       TelegramHelpers.send_in_message(items)
     end

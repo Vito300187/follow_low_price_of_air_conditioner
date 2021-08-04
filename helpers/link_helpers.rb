@@ -1,7 +1,5 @@
 module LinkHelpers
   def self.get_item_link(item)
-    puts 'Получение ссылок на url, image, description, price'
-
     {
       url: "https://www.mvideo.ru#{item.xpath(PATHS[:url_item]).first['href']}",
       image: item.xpath('.//img').first.attributes['src'].value,

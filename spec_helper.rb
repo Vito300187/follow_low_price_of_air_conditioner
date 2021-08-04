@@ -1,6 +1,5 @@
 # frozen_string_literal: true
 
-require 'capybara-screenshot/rspec'
 require 'capybara'
 require 'capybara/dsl'
 require 'capybara/rspec'
@@ -40,7 +39,7 @@ if ENV['SELEN']
     caps = Selenium::WebDriver::Remote::Capabilities.chrome
     caps[:browser_name] = 'chrome'
     caps[:version] = chrome_version
-    caps['enableVNC'] = true
+    caps['enableVNC'] = ENV['VNC'].nil? ? false : true
     caps['sessionTimeout'] = '10m'
     caps['goog:chromeOptions'] = { 'args' => %w[--no-sandbox] }
     opts = {
@@ -72,7 +71,7 @@ end
 
 Telegram.bots_config = { default: YAML.safe_load(File.read('telegram_bot.yml'))['CHAT_BOT_TOKEN'] }
 
-DELICIOUS_PRICE = ENV['PRICE'].nil? ? 20_000 : ENV['PRICE']
+DELICIOUS_PRICE = ENV['PRICE'].nil? ? 20_000 : ENV['PRICE'].to_i
 PATHS = PathsHelpers.paths
 HOME_PAGE_MVIDEO = PATHS[:home_page]
 PREFERENCES_SITE = PreferencesSiteHelper.new
