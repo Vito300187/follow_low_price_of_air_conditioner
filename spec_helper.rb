@@ -33,24 +33,27 @@ Capybara.configure do |config|
   config.default_driver = :remote_chrome
   config.javascript_driver = :remote_chrome
 end
+
 Capybara.register_driver(:remote_chrome) do |app|
   caps = Selenium::WebDriver::Remote::Capabilities.chrome
   caps[:browser_name] = 'chrome'
   caps[:version] = chrome_version
-  caps['enableVNC'] = true
-  caps['sessionTimeout'] = '720h'
+  caps['enableVNC'] = ENV['VNC'].nil? ? false : true
+  caps['sessionTimeout'] = '10m'
   caps['goog:chromeOptions'] = { 'args' => %w[--no-sandbox] }
   opts = {
     browser: :remote,
     url: 'http://localhost:4444/wd/hub',
-    desired_capabilities: caps
+    desired_capabilities: caps,
+    timeout: 300
   }
   Capybara::Selenium::Driver.new(app, **opts)
 end
+
 RSpec.configure { Capybara.page.driver.browser.manage.window.maximize }
 Telegram.bots_config = { default: YAML.safe_load(File.read('telegram_bot.yml'))['CHAT_BOT_TOKEN'] }
 
-DELICIOUS_PRICE = ENV['PRICE'].nil? ? 20_000 : ENV['PRICE']
+DELICIOUS_PRICE = ENV['PRICE'].nil? ? 20_000 : ENV['PRICE'].to_i
 PATHS = PathsHelpers.paths
 HOME_PAGE_MVIDEO = PATHS[:home_page]
 PREFERENCES_SITE = PreferencesSiteHelper.new
