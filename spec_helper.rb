@@ -34,41 +34,23 @@ Capybara.configure do |config|
   config.javascript_driver = :remote_chrome
 end
 
-if ENV['SELEN']
-  Capybara.register_driver(:remote_chrome) do |app|
-    caps = Selenium::WebDriver::Remote::Capabilities.chrome
-    caps[:browser_name] = 'chrome'
-    caps[:version] = chrome_version
-    caps['enableVNC'] = ENV['VNC'].nil? ? false : true
-    caps['sessionTimeout'] = '10m'
-    caps['goog:chromeOptions'] = { 'args' => %w[--no-sandbox] }
-    opts = {
-      browser: :remote,
-      url: 'http://localhost:4444/wd/hub',
-      desired_capabilities: caps,
-      timeout: 300
-    }
-    Capybara::Selenium::Driver.new(app, **opts)
-  end
-elsif ENV['HEADLESS']
-  Capybara.register_driver :chrome do |app|
-    capabilities = Selenium::WebDriver::Remote::Capabilities.chrome(
-      'goog:chromeOptions': { args: %w[headless disable-gpu --no-sandbox] }
-    )
-    Capybara::Selenium::Driver.new(
-      app,
-      browser: :chrome,
-      desired_capabilities: capabilities,
-      timeout: 300
-    )
-  end
+Capybara.register_driver(:remote_chrome) do |app|
+  caps = Selenium::WebDriver::Remote::Capabilities.chrome
+  caps[:browser_name] = 'chrome'
+  caps[:version] = chrome_version
+  caps['enableVNC'] = ENV['VNC'].nil? ? false : true
+  caps['sessionTimeout'] = '10m'
+  caps['goog:chromeOptions'] = { 'args' => %w[--no-sandbox] }
+  opts = {
+    browser: :remote,
+    url: 'http://localhost:4444/wd/hub',
+    desired_capabilities: caps,
+    timeout: 300
+  }
+  Capybara::Selenium::Driver.new(app, **opts)
 end
 
-RSpec.configure do
-  window = Capybara.page.driver.browser.manage.window
-  ENV['HEADLESS'].nil? ? window.maximize : window.resize_to(1920, 1080)
-end
-
+RSpec.configure { Capybara.page.driver.browser.manage.window.maximize }
 Telegram.bots_config = { default: YAML.safe_load(File.read('telegram_bot.yml'))['CHAT_BOT_TOKEN'] }
 
 DELICIOUS_PRICE = ENV['PRICE'].nil? ? 20_000 : ENV['PRICE'].to_i
